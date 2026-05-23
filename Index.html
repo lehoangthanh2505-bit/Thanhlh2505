@@ -31,7 +31,8 @@ import {
   FileText,
   FileSpreadsheet,
   Info,
-  Link as LinkIcon
+  Link as LinkIcon,
+  Filter
 } from 'lucide-react';
 
 const DEFAULT_KPI_DATA = {
@@ -131,7 +132,16 @@ const DEFAULT_GROUP_MA_YTD = {
     { name: 'Bin&Bon 19gr ca', nsv: 57, gm: 3, tr: -22 },
     { name: 'Ponnie 19g', nsv: 50, gm: 13, tr: -11 },
     { name: 'Bin&Bon Heo 35gr', nsv: 48, gm: 28, tr: 3 },
-    { name: 'Ponnie 120g', nsv: 44, gm: 35, tr: 10 }
+    { name: 'Ponnie 120g', nsv: 44, gm: 35, tr: 10 },
+    { name: 'Ponnie hotdog 28g', nsv: 33, gm: 44, tr: 13 },
+    { name: 'Ponnie chân gà', nsv: 25, gm: 25, tr: -5 },
+    { name: 'Ponnie 45g', nsv: 17, gm: 43, tr: 6 },
+    { name: 'Bin&Bon Heo 30gr', nsv: 15, gm: 29, tr: 6 },
+    { name: 'Ponnie hotdog 20g', nsv: 14, gm: 32, tr: -1 },
+    { name: 'Bin&Bon Heo 60gr', nsv: 10, gm: 63, tr: 27 },
+    { name: 'Chà bông', nsv: 9, gm: 28, tr: -5 },
+    { name: 'Thịt áp chảo', nsv: 8, gm: 12, tr: -17 },
+    { name: 'Ponnie da heo', nsv: 4, gm: 21, tr: -16 }
   ]
 };
 
@@ -139,36 +149,80 @@ const DEFAULT_GROUP_MA_FY = {
   hcb: [
     { name: 'HCB Xốt Lắc', nsv: 867, gm: 41, tr: 19 },
     { name: 'HCB Doubling', nsv: 344, gm: 29, tr: 6 },
-    { name: 'HCB Cuốn Cuốn', nsv: 194, gm: 29, tr: 8 }
+    { name: 'HCB Cuốn Cuốn', nsv: 194, gm: 29, tr: 8 },
+    { name: 'HCB Chảo', nsv: 98, gm: 28, tr: 6 },
+    { name: 'HCB Đũa thần 33g', nsv: 69, gm: 38, tr: 11 },
+    { name: 'HCB Túi Lắc', nsv: 42, gm: 42, tr: 16 },
+    { name: 'HCB Meatball', nsv: 32, gm: 29, tr: 0 }
   ],
   ponnie: [
     { name: 'Ponnie 35g', nsv: 448, gm: 35, tr: 8 },
     { name: 'Ponnie 70g', nsv: 244, gm: 40, tr: 11 },
-    { name: 'Ponnie 120g', nsv: 187, gm: 35, tr: 9 }
+    { name: 'Ponnie 120g', nsv: 187, gm: 35, tr: 9 },
+    { name: 'Bin&Bon Heo 35gr', nsv: 145, gm: 27, tr: 1 },
+    { name: 'Ponnie 19g', nsv: 126, gm: 24, tr: -1 },
+    { name: 'Bin&Bon 19gr ca', nsv: 125, gm: 9, tr: -16 },
+    { name: 'Ponnie hotdog 28g', nsv: 104, gm: 42, tr: 13 },
+    { name: 'Ponnie chân gà', nsv: 96, gm: 27, tr: -1 },
+    { name: 'Bin&Bon Heo 30gr', nsv: 49, gm: 29, tr: 4 },
+    { name: 'Ponnie 45g', nsv: 47, gm: 40, tr: 6 },
+    { name: 'Ponnie hotdog 20g', nsv: 46, gm: 29, tr: 1 },
+    { name: 'Bin&Bon Heo 19gr', nsv: 40, gm: 31, tr: 6 },
+    { name: 'Ponnie da heo', nsv: 39, gm: 33, tr: 6 },
+    { name: 'Bin&Bon Heo 60gr', nsv: 33, gm: 64, tr: 14 },
+    { name: 'Thịt áp chảo', nsv: 32, gm: 22, tr: -8 },
+    { name: 'Noodle Partner 58g', nsv: 32, gm: 35, tr: 8 },
+    { name: 'Chà bông', nsv: 25, gm: 31, tr: -1 },
+    { name: 'Ponnie Xiên Kem', nsv: 23, gm: 35, tr: 2 },
+    { name: 'Ponnie Bento', nsv: 22, gm: 35, tr: 8 },
+    { name: 'Ponnie LXNĐ', nsv: 14, gm: 36, tr: 9 },
+    { name: 'Thịt áp chảo slice', nsv: 13, gm: 33, tr: 7 }
   ]
 };
 
-const DEFAULT_MATERIAL_DATA = {
+const createEmptyMatData = () => ({
   summary: [
-    { period: 'YTD Jan-Apr', val: -1.74, rm: -3.89, pm: 2.14, color: 'text-emerald-600', bg: 'border-emerald-200' },
-    { period: 'H1 Jan-Jun', val: 8.62, rm: -6.10, pm: 14.72, color: 'text-rose-600', bg: 'border-rose-200' },
-    { period: 'YTG May-Dec', val: 34.33, rm: 4.06, pm: 30.27, color: 'text-rose-600', bg: 'border-rose-200' },
-    { period: 'Full Year', val: 32.59, rm: 0.17, pm: 32.42, color: 'text-rose-600', bg: 'border-rose-200' }
+    { period: 'YTD Jan-Apr', val: 0, rm: 0, pm: 0 },
+    { period: 'H1 Jan-Jun', val: 0, rm: 0, pm: 0 },
+    { period: 'YTG May-Dec', val: 0, rm: 0, pm: 0 },
+    { period: 'Full Year', val: 0, rm: 0, pm: 0 }
   ],
-  topSavings: [
-    { name: 'Thịt gà xay đông lạnh', val: 2.87, pct: -13.2 },
-    { name: 'Collagen Casing Devro Ø17', val: 1.73, pct: -15.0 },
-    { name: 'Đường RS', val: 0.94, pct: -17.2 },
-    { name: 'Da heo sấy khô', val: 0.79, pct: -7.8 },
-    { name: 'Rong biển tấm gia vị', val: 0.52, pct: -1.8 }
-  ],
-  topHeadwinds: [
-    { name: 'Ly XXTT CB 48ly x 3cây', val: 8.86, pct: 34.5 },
-    { name: 'Clip nhôm xúc xích 2.1mm', val: 2.61, pct: 30.2 },
-    { name: 'Màng PVDC đỏ HCB xốt lắc', val: 2.02, pct: 7.8 },
-    { name: 'Màng OPP Ponnie heo 35gr', val: 1.63, pct: 45.1 },
-    { name: 'Túi retort chân gà Ponnie', val: 1.46, pct: 25.7 }
-  ]
+  topSavings: Array(5).fill(null).map(() => ({ name: '', val: 0, pct: 0 })),
+  topHeadwinds: Array(5).fill(null).map(() => ({ name: '', val: 0, pct: 0 }))
+});
+
+const DEFAULT_MATERIAL_DATA = {
+  ly: {
+    all: {
+      summary: [
+        { period: 'YTD Jan-Apr', val: -1.74, rm: -3.89, pm: 2.14 },
+        { period: 'H1 Jan-Jun', val: 8.62, rm: -6.10, pm: 14.72 },
+        { period: 'YTG May-Dec', val: 34.33, rm: 4.06, pm: 30.27 },
+        { period: 'Full Year', val: 32.59, rm: 0.17, pm: 32.42 }
+      ],
+      topSavings: [
+        { name: 'Thịt gà xay đông lạnh', val: 2.87, pct: -13.2 },
+        { name: 'Collagen Casing Devro Ø17', val: 1.73, pct: -15.0 },
+        { name: 'Đường RS', val: 0.94, pct: -17.2 },
+        { name: 'Da heo sấy khô', val: 0.79, pct: -7.8 },
+        { name: 'Rong biển tấm gia vị', val: 0.52, pct: -1.8 }
+      ],
+      topHeadwinds: [
+        { name: 'Ly XXTT CB 48ly x 3cây', val: 8.86, pct: 34.5 },
+        { name: 'Clip nhôm xúc xích 2.1mm', val: 2.61, pct: 30.2 },
+        { name: 'Màng PVDC đỏ HCB xốt lắc', val: 2.02, pct: 7.8 },
+        { name: 'Màng OPP Ponnie heo 35gr', val: 1.63, pct: 45.1 },
+        { name: 'Túi retort chân gà Ponnie', val: 1.46, pct: 25.7 }
+      ]
+    },
+    hcb: createEmptyMatData(),
+    ponnie: createEmptyMatData()
+  },
+  iop: {
+    all: createEmptyMatData(),
+    hcb: createEmptyMatData(),
+    ponnie: createEmptyMatData()
+  }
 };
 
 const DEFAULT_GMIT_PROJECTS = [
@@ -190,6 +244,13 @@ const App = () => {
   const [timeframe, setTimeframe] = useState('ytd'); // 'ytd' or 'fy'
   const [pnlDimension, setPnlDimension] = useState('brand'); // 'brand', 'channel', 'subcat'
   const [gmitUnit, setGmitUnit] = useState('million'); // 'million' or 'billion'
+  
+  // New states for Material tab
+  const [matCompare, setMatCompare] = useState('ly'); // 'ly' or 'iop'
+  const [matBrand, setMatBrand] = useState('all'); // 'all', 'hcb', 'ponnie'
+  const [configMatCompare, setConfigMatCompare] = useState('ly');
+  const [configMatBrand, setConfigMatBrand] = useState('all');
+
   const [configSubTab, setConfigSubTab] = useState('kpis'); // Sub tab inside Settings
   const [pnlEditSelect, setPnlEditSelect] = useState('brandYtd'); // State to choose which P&L sheet to edit
   const [sheetJsLoaded, setSheetJsLoaded] = useState(false);
@@ -244,7 +305,15 @@ const App = () => {
 
   const [materials, setMaterials] = useState(() => {
     const saved = localStorage.getItem('pm_materials');
-    return saved ? JSON.parse(saved) : DEFAULT_MATERIAL_DATA;
+    if (saved) {
+      const parsed = JSON.parse(saved);
+      // Migration check: if old flat structure, reset to nested default
+      if (parsed.summary && Array.isArray(parsed.summary)) {
+        return DEFAULT_MATERIAL_DATA;
+      }
+      return parsed;
+    }
+    return DEFAULT_MATERIAL_DATA;
   });
 
   const [alertMsg, setAlertMsg] = useState(null);
@@ -411,6 +480,45 @@ const App = () => {
       const wsPnL = window.XLSX.utils.aoa_to_sheet(pnlRows);
       window.XLSX.utils.book_append_sheet(wb, wsPnL, "PnL_Sheets_Data");
 
+      // Sheet 4: Group MA SKUs
+      const skuRows = [["TIMEFRAME", "BRAND", "GROUP MA NAME", "NSV (Tỷ)", "GM%", "TR%"]];
+      ['ytd', 'fy'].forEach(tf => {
+        ['hcb', 'ponnie'].forEach(br => {
+           groupMAState[tf][br].forEach(item => {
+             skuRows.push([tf.toUpperCase(), br.toUpperCase(), item.name, item.nsv, item.gm, item.tr]);
+           });
+        });
+      });
+      const wsSKUs = window.XLSX.utils.aoa_to_sheet(skuRows);
+      window.XLSX.utils.book_append_sheet(wb, wsSKUs, "SKUs_Group_MA");
+
+      // Sheet 5: Materials Summary
+      const matSumRows = [["COMPARE_VS", "BRAND", "PERIOD", "TOTAL_VAL", "RM_VAL", "PM_VAL"]];
+      ['ly', 'iop'].forEach(comp => {
+        ['all', 'hcb', 'ponnie'].forEach(br => {
+           materials[comp][br].summary.forEach(item => {
+             matSumRows.push([comp.toUpperCase(), br.toUpperCase(), item.period, item.val, item.rm, item.pm]);
+           });
+        });
+      });
+      const wsMatSum = window.XLSX.utils.aoa_to_sheet(matSumRows);
+      window.XLSX.utils.book_append_sheet(wb, wsMatSum, "Materials_Summary");
+
+      // Sheet 6: Materials Top 5
+      const matTopRows = [["COMPARE_VS", "BRAND", "TYPE", "RANK", "MATERIAL_NAME", "IMPACT_VAL", "IMPACT_PCT"]];
+      ['ly', 'iop'].forEach(comp => {
+        ['all', 'hcb', 'ponnie'].forEach(br => {
+           materials[comp][br].topSavings.forEach((item, idx) => {
+             matTopRows.push([comp.toUpperCase(), br.toUpperCase(), "Saving", idx + 1, item.name || '', item.val || 0, item.pct || 0]);
+           });
+           materials[comp][br].topHeadwinds.forEach((item, idx) => {
+             matTopRows.push([comp.toUpperCase(), br.toUpperCase(), "Headwind", idx + 1, item.name || '', item.val || 0, item.pct || 0]);
+           });
+        });
+      });
+      const wsMatTop = window.XLSX.utils.aoa_to_sheet(matTopRows);
+      window.XLSX.utils.book_append_sheet(wb, wsMatTop, "Materials_Top5");
+
       window.XLSX.writeFile(wb, "Processed_Meat_Dashboard_Template.xlsx");
       triggerAlert("Đã xuất file mẫu thành công!");
     } catch (err) {
@@ -530,6 +638,72 @@ const App = () => {
           });
         }
 
+        // 4. Parse Sheet "SKUs_Group_MA"
+        if (workbook.Sheets["SKUs_Group_MA"]) {
+           const rows = window.XLSX.utils.sheet_to_json(workbook.Sheets["SKUs_Group_MA"]);
+           let tempGroupMA = { ytd: { hcb: [], ponnie: [] }, fy: { hcb: [], ponnie: [] } };
+           rows.forEach(r => {
+             const tf = (r["TIMEFRAME"] || '').toLowerCase();
+             const br = (r["BRAND"] || '').toLowerCase();
+             if ((tf==='ytd'||tf==='fy') && (br==='hcb'||br==='ponnie')) {
+               tempGroupMA[tf][br].push({
+                 name: String(r["GROUP MA NAME"] || ''),
+                 nsv: parseFloat(r["NSV (Tỷ)"] || r["NSV"]) || 0,
+                 gm: parseFloat(r["GM%"]) || 0,
+                 tr: parseFloat(r["TR%"]) || 0
+               });
+             }
+           });
+           setGroupMAState(tempGroupMA);
+        }
+
+        // 5 & 6. Parse Materials Sheets
+        let matUpdated = JSON.parse(JSON.stringify(materials));
+        if (workbook.Sheets["Materials_Summary"]) {
+           const rows = window.XLSX.utils.sheet_to_json(workbook.Sheets["Materials_Summary"]);
+           rows.forEach(r => {
+             const comp = (r["COMPARE_VS"] || '').toLowerCase();
+             const br = (r["BRAND"] || '').toLowerCase();
+             const period = r["PERIOD"];
+             if ((comp==='ly'||comp==='iop') && (br==='all'||br==='hcb'||br==='ponnie') && period) {
+               const targetArr = matUpdated[comp][br].summary;
+               const targetItem = targetArr.find(i => i.period === period);
+               if (targetItem) {
+                 targetItem.val = parseFloat(r["TOTAL_VAL"]) || 0;
+                 targetItem.rm = parseFloat(r["RM_VAL"]) || 0;
+                 targetItem.pm = parseFloat(r["PM_VAL"]) || 0;
+               }
+             }
+           });
+        }
+        
+        if (workbook.Sheets["Materials_Top5"]) {
+           const rows = window.XLSX.utils.sheet_to_json(workbook.Sheets["Materials_Top5"]);
+           // Khởi tạo lại Top 5 trống trước khi nạp
+           ['ly', 'iop'].forEach(c => ['all', 'hcb', 'ponnie'].forEach(b => {
+               matUpdated[c][b].topSavings = Array(5).fill(null).map(()=>({name:'', val:0, pct:0}));
+               matUpdated[c][b].topHeadwinds = Array(5).fill(null).map(()=>({name:'', val:0, pct:0}));
+           }));
+
+           rows.forEach(r => {
+             const comp = (r["COMPARE_VS"] || '').toLowerCase();
+             const br = (r["BRAND"] || '').toLowerCase();
+             const type = r["TYPE"] || '';
+             const rank = parseInt(r["RANK"]) || 1;
+             
+             if ((comp==='ly'||comp==='iop') && (br==='all'||br==='hcb'||br==='ponnie') && rank >= 1 && rank <= 5) {
+                const item = {
+                  name: String(r["MATERIAL_NAME"] || ''),
+                  val: parseFloat(r["IMPACT_VAL"]) || 0,
+                  pct: parseFloat(r["IMPACT_PCT"]) || 0
+                };
+                if (type === 'Saving') matUpdated[comp][br].topSavings[rank - 1] = item;
+                if (type === 'Headwind') matUpdated[comp][br].topHeadwinds[rank - 1] = item;
+             }
+           });
+        }
+        setMaterials(matUpdated);
+
         setKpis(kpisUpdated);
         setBrands(brandsUpdated);
         setFyTracking(fyTrackingUpdated);
@@ -609,6 +783,12 @@ const App = () => {
 
   const { headers: pnlHeaders, data: pnlData } = getPnlData();
   const currentGroupMA = timeframe === 'ytd' ? groupMAState.ytd : groupMAState.fy;
+  
+  // Data accessor for Material Tab
+  const currentMatData = materials[matCompare]?.[matBrand] || materials.ly.all;
+  // Calculate max values for progress bars dynamically
+  const maxSavingVal = Math.max(...(currentMatData.topSavings?.map(i => i.val) || [0]), 1);
+  const maxHeadwindVal = Math.max(...(currentMatData.topHeadwinds?.map(i => i.val) || [0]), 1);
 
   return (
     <div className="min-h-screen bg-slate-50 font-sans text-slate-800 pb-20">
@@ -1047,17 +1227,58 @@ const App = () => {
         {/* --- BIẾN ĐỘNG GIÁ TAB --- */}
         {activeTab === 'material' && (
           <div className="space-y-6 animate-in fade-in duration-300">
+            {/* --- Control Bar --- */}
+            <div className="bg-white rounded-xl shadow-sm border border-slate-200 p-4 flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
+              <div className="flex items-center gap-2 text-slate-800 font-bold">
+                <Filter className="w-5 h-5 text-indigo-500" />
+                Bộ lọc View Dữ liệu:
+              </div>
+              
+              <div className="flex flex-wrap items-center gap-4">
+                <div className="flex bg-slate-100 rounded-lg p-1 border border-slate-200">
+                  <button 
+                    onClick={() => setMatBrand('all')} 
+                    className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${matBrand === 'all' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+                  >All Brands</button>
+                  <button 
+                    onClick={() => setMatBrand('hcb')} 
+                    className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${matBrand === 'hcb' ? 'bg-blue-600 shadow-sm text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                  >HCB</button>
+                  <button 
+                    onClick={() => setMatBrand('ponnie')} 
+                    className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${matBrand === 'ponnie' ? 'bg-orange-500 shadow-sm text-white' : 'text-slate-500 hover:text-slate-700'}`}
+                  >PONNIE</button>
+                </div>
+                
+                <div className="flex bg-slate-100 rounded-lg p-1 border border-slate-200">
+                  <button 
+                    onClick={() => setMatCompare('ly')} 
+                    className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${matCompare === 'ly' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+                  >So với LY</button>
+                  <button 
+                    onClick={() => setMatCompare('iop')} 
+                    className={`px-4 py-2 rounded-md text-xs font-bold transition-all ${matCompare === 'iop' ? 'bg-white shadow-sm text-indigo-700' : 'text-slate-500 hover:text-slate-700'}`}
+                  >So với IOP</button>
+                </div>
+              </div>
+            </div>
+
             <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-              {materials.summary.map((item) => {
+              {currentMatData.summary.map((item) => {
                 const isSaving = item.val < 0;
+                const isNeutral = item.val === 0;
+                const borderColor = isSaving ? 'border-emerald-200' : (isNeutral ? 'border-slate-200' : 'border-rose-200');
+                const textColor = isSaving ? 'text-emerald-600' : (isNeutral ? 'text-slate-600' : 'text-rose-600');
                 return (
-                  <div key={item.period} className={`bg-white rounded-xl shadow-sm border-2 ${item.bg} p-5 relative overflow-hidden transition-all hover:scale-102`}>
+                  <div key={item.period} className={`bg-white rounded-xl shadow-sm border-2 ${borderColor} p-5 relative overflow-hidden transition-all hover:scale-102`}>
                     <div className="text-xs font-extrabold text-slate-400 uppercase mb-2 tracking-wider">{item.period}</div>
-                    <div className={`text-3xl font-black ${item.color} flex items-center`}>
-                      {isSaving ? '' : '+'}{item.val} 
-                      <span className="text-xs font-bold text-slate-400 ml-1">Tỷ VND</span>
+                    <div className={`text-3xl font-black ${textColor} flex items-center`}>
+                      {isSaving || isNeutral ? '' : '+'}{item.val} 
+                      <span className="text-xs font-bold text-slate-400 ml-1">Tỷ</span>
                       {isSaving ? (
                         <TrendingDown className="w-6 h-6 ml-auto text-emerald-500" />
+                      ) : isNeutral ? (
+                        <Activity className="w-6 h-6 ml-auto text-slate-400" />
                       ) : (
                         <TrendingUp className="w-6 h-6 ml-auto text-rose-500" />
                       )}
@@ -1066,14 +1287,14 @@ const App = () => {
                     <div className="mt-4 pt-4 border-t border-slate-100 space-y-1 text-xs">
                       <div className="flex justify-between">
                         <span className="text-slate-500 font-medium">RM (Nguyên liệu):</span>
-                        <span className={`font-bold ${item.rm > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                          {item.rm > 0 ? '+' : ''}{item.rm} Tỷ
+                        <span className={`font-bold ${item.rm < 0 ? 'text-emerald-600' : (item.rm > 0 ? 'text-rose-600' : 'text-slate-500')}`}>
+                          {item.rm > 0 ? '+' : ''}{item.rm}
                         </span>
                       </div>
                       <div className="flex justify-between">
                         <span className="text-slate-500 font-medium">PM (Bao bì):</span>
-                        <span className={`font-bold ${item.pm > 0 ? 'text-rose-600' : 'text-emerald-600'}`}>
-                          {item.pm > 0 ? '+' : ''}{item.pm} Tỷ
+                        <span className={`font-bold ${item.pm < 0 ? 'text-emerald-600' : (item.pm > 0 ? 'text-rose-600' : 'text-slate-500')}`}>
+                          {item.pm > 0 ? '+' : ''}{item.pm}
                         </span>
                       </div>
                     </div>
@@ -1087,12 +1308,17 @@ const App = () => {
                 <div>
                   <h3 className="text-xl font-bold text-slate-800 flex items-center">
                     <PackageMinus className="w-6 h-6 mr-3 text-indigo-500" />
-                    Material Price Impact vs Last Year | Total PM (MUF 2026)
+                    Tác động Giá Nguyên vật liệu (Material Price Impact)
                   </h3>
-                  <p className="text-sm text-slate-400 mt-1">Sắp xếp và cập nhật theo dữ liệu chính thức từ slide tài liệu tài chính.</p>
+                  <p className="text-sm text-slate-400 mt-1">Chi tiết các mặt hàng có mức thay đổi giá lớn nhất.</p>
                 </div>
-                <div className="text-xs font-bold text-slate-400 uppercase tracking-wider bg-slate-100 border border-slate-200 px-3 py-1.5 rounded-full">
-                  All Brands | RM & PM | Full Year 2026
+                <div className="flex items-center gap-2">
+                  <div className={`text-xs font-bold text-white uppercase tracking-wider px-3 py-1.5 rounded-full ${matBrand === 'all' ? 'bg-slate-700' : matBrand === 'hcb' ? 'bg-blue-600' : 'bg-orange-500'}`}>
+                    {matBrand === 'all' ? 'ALL BRANDS' : matBrand.toUpperCase()}
+                  </div>
+                  <div className="text-xs font-bold text-indigo-700 uppercase tracking-wider bg-indigo-50 border border-indigo-200 px-3 py-1.5 rounded-full">
+                    VS {matCompare.toUpperCase()}
+                  </div>
                 </div>
               </div>
 
@@ -1100,59 +1326,81 @@ const App = () => {
                 <div>
                   <h4 className="text-emerald-600 font-bold text-sm mb-6 flex items-center uppercase tracking-widest border-b border-emerald-100 pb-2">
                     <ArrowDown className="w-5 h-5 mr-2 bg-emerald-50 rounded-full p-0.5" /> 
-                    Top 5 Savings (Favourable - Tiết kiệm)
+                    Top Savings (Favourable - Tiết kiệm)
                   </h4>
                   <div className="space-y-6">
-                    {materials.topSavings.map((item, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-semibold text-slate-700">
-                            {idx + 1}. {item.name} 
-                            <span className="text-emerald-500 font-medium ml-1">({item.pct}%)</span>
-                          </span>
-                          <span className="font-bold text-emerald-600">-{item.val} Tỷ</span>
+                    {(() => {
+                      const activeSavings = currentMatData.topSavings?.filter(i => i.name) || [];
+                      if (activeSavings.length === 0) {
+                        return (
+                          <div className="text-slate-500 text-sm py-6 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-lg flex items-center gap-2">
+                            <Settings className="w-4 h-4 text-slate-400" />
+                            Vui lòng nhập dữ liệu trong tab ⚙️ Thiết lập
+                          </div>
+                        );
+                      }
+                      return activeSavings.map((item, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="font-semibold text-slate-700">
+                              {idx + 1}. {item.name} 
+                              <span className="text-emerald-500 font-medium ml-1">({item.pct}%)</span>
+                            </span>
+                            <span className="font-bold text-emerald-600">-{item.val} Tỷ</span>
+                          </div>
+                          <div className="w-full bg-slate-100 h-6 rounded overflow-hidden shadow-inner">
+                            <div 
+                              className="bg-emerald-500 h-full rounded transition-all duration-1000 ease-out" 
+                              style={{ width: `${(item.val / maxSavingVal) * 100}%` }}
+                            ></div>
+                          </div>
                         </div>
-                        <div className="w-full bg-slate-100 h-6 rounded overflow-hidden shadow-inner">
-                          <div 
-                            className="bg-emerald-500 h-full rounded transition-all duration-1000 ease-out" 
-                            style={{ width: `${(item.val / 2.87) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
+                      ));
+                    })()}
                   </div>
                 </div>
 
                 <div>
                   <h4 className="text-rose-600 font-bold text-sm mb-6 flex items-center uppercase tracking-widest border-b border-rose-100 pb-2">
                     <ArrowUp className="w-5 h-5 mr-2 bg-rose-50 rounded-full p-0.5" /> 
-                    Top 5 Headwinds (Unfavourable - Bất lợi)
+                    Top Headwinds (Unfavourable - Bất lợi)
                   </h4>
                   <div className="space-y-6">
-                    {materials.topHeadwinds.map((item, idx) => (
-                      <div key={idx} className="space-y-1">
-                        <div className="flex justify-between text-sm">
-                          <span className="font-semibold text-slate-700">
-                            {idx + 1}. {item.name} 
-                            <span className="text-rose-500 font-medium ml-1">(+{item.pct}%)</span>
-                          </span>
-                          <span className="font-bold text-rose-600">+{item.val} Tỷ</span>
+                    {(() => {
+                      const activeHeadwinds = currentMatData.topHeadwinds?.filter(i => i.name) || [];
+                      if (activeHeadwinds.length === 0) {
+                        return (
+                          <div className="text-slate-500 text-sm py-6 px-4 bg-slate-50 border border-dashed border-slate-200 rounded-lg flex items-center gap-2">
+                            <Settings className="w-4 h-4 text-slate-400" />
+                            Vui lòng nhập dữ liệu trong tab ⚙️ Thiết lập
+                          </div>
+                        );
+                      }
+                      return activeHeadwinds.map((item, idx) => (
+                        <div key={idx} className="space-y-1">
+                          <div className="flex justify-between text-sm">
+                            <span className="font-semibold text-slate-700">
+                              {idx + 1}. {item.name} 
+                              <span className="text-rose-500 font-medium ml-1">(+{item.pct}%)</span>
+                            </span>
+                            <span className="font-bold text-rose-600">+{item.val} Tỷ</span>
+                          </div>
+                          <div className="w-full bg-slate-100 h-6 rounded overflow-hidden shadow-inner">
+                            <div 
+                              className="bg-rose-500 h-full rounded transition-all duration-1000 ease-out" 
+                              style={{ width: `${(item.val / maxHeadwindVal) * 100}%` }}
+                            ></div>
+                          </div>
                         </div>
-                        <div className="w-full bg-slate-100 h-6 rounded overflow-hidden shadow-inner">
-                          <div 
-                            className="bg-rose-500 h-full rounded transition-all duration-1000 ease-out" 
-                            style={{ width: `${(item.val / 8.86) * 100}%` }}
-                          ></div>
-                        </div>
-                      </div>
-                    ))}
+                      ));
+                    })()}
                   </div>
                 </div>
               </div>
 
               <div className="mt-12 pt-6 border-t border-slate-100 flex flex-col md:flex-row justify-between text-[11px] text-slate-400 uppercase tracking-widest gap-2">
                  <span>Đơn vị tính: Tỷ VND</span>
-                 <span>Lưu ý: (+) biểu thị giá cao hơn năm ngoái (Bất lợi) | (-) biểu thị giá thấp hơn (Có lợi)</span>
+                 <span>Lưu ý: (+) biểu thị giá cao hơn (Bất lợi) | (-) biểu thị giá thấp hơn (Có lợi)</span>
               </div>
             </div>
           </div>
@@ -1815,15 +2063,39 @@ const App = () => {
 
                 {configSubTab === 'materials' && (
                   <div className="space-y-6">
-                    <div>
-                      <h4 className="font-bold text-slate-800 text-base">Cấu hình Biến động Giá RM (Nguyên liệu) & PM (Bao bì)</h4>
-                      <p className="text-slate-400 text-xs mt-0.5">Tùy chỉnh tác động giá nguyên vật liệu so với cùng kỳ năm trước.</p>
+                    <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                      <div>
+                        <h4 className="font-bold text-slate-800 text-base">Cấu hình Biến động Giá RM (Nguyên liệu) & PM (Bao bì)</h4>
+                        <p className="text-slate-400 text-xs mt-0.5">Lựa chọn Bảng dữ liệu (View) bạn muốn cập nhật.</p>
+                      </div>
+                      
+                      <div className="flex gap-2">
+                         <select 
+                          value={configMatBrand}
+                          onChange={(e) => setConfigMatBrand(e.target.value)}
+                          className="px-3 py-2 border rounded-lg text-xs md:text-sm bg-slate-50 font-semibold focus:ring-1 focus:ring-indigo-500 outline-none"
+                         >
+                           <option value="all">All Brands</option>
+                           <option value="hcb">HCB</option>
+                           <option value="ponnie">PONNIE</option>
+                         </select>
+                         <select 
+                          value={configMatCompare}
+                          onChange={(e) => setConfigMatCompare(e.target.value)}
+                          className="px-3 py-2 border rounded-lg text-xs md:text-sm bg-slate-50 font-semibold focus:ring-1 focus:ring-indigo-500 outline-none"
+                         >
+                           <option value="ly">So với LY</option>
+                           <option value="iop">So với IOP</option>
+                         </select>
+                      </div>
                     </div>
 
                     <div className="space-y-4">
-                      <h5 className="text-xs font-bold uppercase tracking-wider text-indigo-600">Bốn mốc liên kết thời gian chính (Tỷ VND)</h5>
+                      <h5 className="text-xs font-bold uppercase tracking-wider text-indigo-600">
+                        Sửa dữ liệu tổng hợp ({configMatBrand.toUpperCase()} | VS {configMatCompare.toUpperCase()})
+                      </h5>
                       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {materials.summary.map((item, idx) => (
+                        {(materials[configMatCompare]?.[configMatBrand]?.summary || []).map((item, idx) => (
                           <div key={item.period} className="p-4 border rounded-xl bg-slate-50/50 space-y-3">
                             <span className="text-xs font-extrabold text-slate-600">{item.period}</span>
                             <div className="grid grid-cols-3 gap-2">
@@ -1835,7 +2107,7 @@ const App = () => {
                                   value={item.val} 
                                   onChange={(e) => {
                                     const updated = { ...materials };
-                                    updated.summary[idx].val = parseFloat(e.target.value) || 0;
+                                    updated[configMatCompare][configMatBrand].summary[idx].val = parseFloat(e.target.value) || 0;
                                     setMaterials(updated);
                                   }}
                                   className="w-full px-2 py-1 border rounded text-xs text-right font-bold"
@@ -1849,7 +2121,7 @@ const App = () => {
                                   value={item.rm} 
                                   onChange={(e) => {
                                     const updated = { ...materials };
-                                    updated.summary[idx].rm = parseFloat(e.target.value) || 0;
+                                    updated[configMatCompare][configMatBrand].summary[idx].rm = parseFloat(e.target.value) || 0;
                                     setMaterials(updated);
                                   }}
                                   className="w-full px-2 py-1 border rounded text-xs text-right"
@@ -1863,7 +2135,7 @@ const App = () => {
                                   value={item.pm} 
                                   onChange={(e) => {
                                     const updated = { ...materials };
-                                    updated.summary[idx].pm = parseFloat(e.target.value) || 0;
+                                    updated[configMatCompare][configMatBrand].summary[idx].pm = parseFloat(e.target.value) || 0;
                                     setMaterials(updated);
                                   }}
                                   className="w-full px-2 py-1 border rounded text-xs text-right"
@@ -1872,6 +2144,102 @@ const App = () => {
                             </div>
                           </div>
                         ))}
+                      </div>
+
+                      <div className="space-y-4 border-t border-slate-100 pt-6">
+                        <h5 className="text-xs font-bold uppercase tracking-wider text-emerald-600">
+                          Top 5 Savings (Tiết kiệm)
+                        </h5>
+                        <div className="grid grid-cols-1 gap-2">
+                          {(materials[configMatCompare]?.[configMatBrand]?.topSavings || []).map((item, idx) => (
+                            <div key={idx} className="flex gap-2 items-center">
+                              <span className="text-xs font-bold text-slate-400 w-4">{idx + 1}.</span>
+                              <input
+                                type="text"
+                                value={item.name}
+                                placeholder="Tên nguyên liệu (bỏ trống nếu không có)"
+                                onChange={(e) => {
+                                  const updated = { ...materials };
+                                  updated[configMatCompare][configMatBrand].topSavings[idx].name = e.target.value;
+                                  setMaterials(updated);
+                                }}
+                                className="flex-1 px-3 py-1.5 border rounded text-xs font-semibold"
+                              />
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={item.val || ''}
+                                placeholder="Tỷ VND"
+                                onChange={(e) => {
+                                  const updated = { ...materials };
+                                  updated[configMatCompare][configMatBrand].topSavings[idx].val = parseFloat(e.target.value) || 0;
+                                  setMaterials(updated);
+                                }}
+                                className="w-24 px-3 py-1.5 border rounded text-xs text-right font-medium"
+                              />
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={item.pct || ''}
+                                placeholder="%"
+                                onChange={(e) => {
+                                  const updated = { ...materials };
+                                  updated[configMatCompare][configMatBrand].topSavings[idx].pct = parseFloat(e.target.value) || 0;
+                                  setMaterials(updated);
+                                }}
+                                className="w-20 px-3 py-1.5 border rounded text-xs text-right text-slate-500"
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+
+                      <div className="space-y-4 border-t border-slate-100 pt-6">
+                        <h5 className="text-xs font-bold uppercase tracking-wider text-rose-600">
+                          Top 5 Headwinds (Bất lợi)
+                        </h5>
+                        <div className="grid grid-cols-1 gap-2">
+                          {(materials[configMatCompare]?.[configMatBrand]?.topHeadwinds || []).map((item, idx) => (
+                            <div key={idx} className="flex gap-2 items-center">
+                              <span className="text-xs font-bold text-slate-400 w-4">{idx + 1}.</span>
+                              <input
+                                type="text"
+                                value={item.name}
+                                placeholder="Tên nguyên liệu (bỏ trống nếu không có)"
+                                onChange={(e) => {
+                                  const updated = { ...materials };
+                                  updated[configMatCompare][configMatBrand].topHeadwinds[idx].name = e.target.value;
+                                  setMaterials(updated);
+                                }}
+                                className="flex-1 px-3 py-1.5 border rounded text-xs font-semibold"
+                              />
+                              <input
+                                type="number"
+                                step="0.01"
+                                value={item.val || ''}
+                                placeholder="Tỷ VND"
+                                onChange={(e) => {
+                                  const updated = { ...materials };
+                                  updated[configMatCompare][configMatBrand].topHeadwinds[idx].val = parseFloat(e.target.value) || 0;
+                                  setMaterials(updated);
+                                }}
+                                className="w-24 px-3 py-1.5 border rounded text-xs text-right font-medium"
+                              />
+                              <input
+                                type="number"
+                                step="0.1"
+                                value={item.pct || ''}
+                                placeholder="%"
+                                onChange={(e) => {
+                                  const updated = { ...materials };
+                                  updated[configMatCompare][configMatBrand].topHeadwinds[idx].pct = parseFloat(e.target.value) || 0;
+                                  setMaterials(updated);
+                                }}
+                                className="w-20 px-3 py-1.5 border rounded text-xs text-right text-slate-500"
+                              />
+                            </div>
+                          ))}
+                        </div>
                       </div>
                     </div>
                   </div>
